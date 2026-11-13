@@ -335,13 +335,13 @@ as six-element arrays).
 | [`PetrovichTests.cs`](Cyriller.Tests/PetrovichTests.cs) | 55 name forms from the NPetrovich CSV fixtures and 18 expectations from `petrovich.spec.js`; both skip when absent |
 | [`UdNounTests.cs`](Cyriller.Tests/UdNounTests.cs) | Up to 4000 noun tokens of `ru_syntagrus-ud-test.conllu`: the corpus form must be the one the dictionary gives for the lemma, its case and its number |
 | [`KaikkiNounTests.cs`](Cyriller.Tests/KaikkiNounTests.cs) | Up to 1200 dictionary nouns from the first 400 000 lines of `ru-extract.jsonl`: every Wiktionary form of an attested case/number must match, with stress marks and non-Russian letters filtered out |
-| [`NameDeclensionTests.cs`](Cyriller.Tests/NameDeclensionTests.cs) | 100 sampled surname + given-name pairs (50 male, 50 female, seed `20261113`) declined by `CyrName` and compared with the `Sur`/`Giv` `PROPN` forms attested in SynTagRus; the name type is part of the key, because the same string can be both a surname and a given name |
+| [`NameDeclensionTests.cs`](Cyriller.Tests/NameDeclensionTests.cs) | 5000 sampled surname + given-name pairs (2500 male, 2500 female, distinct combinations, seed `20261113`) declined by `CyrName` and compared with the `Sur`/`Giv` `PROPN` forms attested in SynTagRus; the name type is part of the key, because the same string can be both a surname and a given name |
 | [`CorpusFiles.cs`](Cyriller.Tests/CorpusFiles.cs) | Finds `Test_data` from the build output, shares a single `CyrNounCollection` and normalises `ё` and stress marks |
 
 The EF6 model and the SQL Server fixture were removed together with the old `NounTests`; the
 dictionary checks now run against the embedded resources and the external corpora, so
 `dotnet test` needs neither a database nor network access. The corpus tests allow a small mismatch
-budget (Petrovich 10 %, SynTagRus 5 %, Wiktionary 10 %), because the corpora contain dialectal,
+budget (Petrovich 10 %, SynTagRus 5 %, Wiktionary 10 %, sampled names 2 %), because the corpora contain dialectal,
 obsolete and suppletive forms (`человек → людей`, `год → году`) that the dictionaries regularise.
 
 ## 9. `Cyriller.Samples`

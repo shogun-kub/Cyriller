@@ -8,7 +8,7 @@ using Xunit;
 namespace Cyriller.Tests
 {
     /// <summary>
-    /// Выборочная проверка полных имён: берём 50 мужских и 50 женских пар
+    /// Выборочная проверка полных имён: берём 2500 мужских и 2500 женских пар
     /// «фамилия + имя» из <c>russian_surnames.csv</c> и <c>ru-pnames-list</c>,
     /// склоняем их и сверяем падежные формы с тем, как эти же слова просклоняны
     /// в корпусе SynTagRus (PROPN с <c>NameType=Sur</c> для фамилий и <c>Giv</c> для имён).
@@ -17,8 +17,8 @@ namespace Cyriller.Tests
     /// </summary>
     public class NameDeclensionTests
     {
-        private const int CombosPerGender = 50;
-        private const double MaxMismatchRate = 0.10;
+        private const int CombosPerGender = 2500;
+        private const double MaxMismatchRate = 0.02;
 
         private const string SurnameType = "Sur";
         private const string GivenNameType = "Giv";
@@ -184,11 +184,17 @@ namespace Cyriller.Tests
             Random random)
         {
             List<(string, string, GendersEnum)> result = new List<(string, string, GendersEnum)>();
+            HashSet<(string Surname, string Name)> seen = new HashSet<(string, string)>();
 
-            for (int i = 0; i < count; i++)
+            while (result.Count < Math.Min(count, surnames.Count * names.Count))
             {
                 string surname = surnames[random.Next(surnames.Count)];
                 string name = names[random.Next(names.Count)];
+
+                if (!seen.Add((surname, name)))
+                {
+                    continue;
+                }
 
                 result.Add((surname, name, gender));
             }

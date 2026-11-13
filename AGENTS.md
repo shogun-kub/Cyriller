@@ -155,13 +155,14 @@ passed through. A restore that pulls new packages needs an approved `danger-full
   SynTagRus UD treebank (CC BY-NC-SA 4.0), up to 4000 tokens.
 - [`Cyriller.Tests/KaikkiNounTests.cs`](Cyriller.Tests/KaikkiNounTests.cs) — noun paradigms from
   the Wiktionary extract (CC BY-SA 4.0), up to 1200 lemmas from the start of the file.
-- [`Cyriller.Tests/NameDeclensionTests.cs`](Cyriller.Tests/NameDeclensionTests.cs) — 100 sampled
-  «фамилия + имя» pairs (50 male, 50 female) from the CSV and the name lists, checked against the
-  declensions attested in SynTagRus; the seed is fixed, so the sample is reproducible.
+- [`Cyriller.Tests/NameDeclensionTests.cs`](Cyriller.Tests/NameDeclensionTests.cs) — 5000 sampled
+  «фамилия + имя» pairs (2500 male, 2500 female, distinct combinations) from the CSV and the name
+  lists, checked against the declensions attested in SynTagRus; the seed is fixed, so the sample
+  is reproducible.
 - [`Cyriller.Tests/CorpusFiles.cs`](Cyriller.Tests/CorpusFiles.cs) — locates `Test_data`, shares
   one noun collection and normalises stress marks and `ё`.
 - 70 tests, xunit 2.9.3 on `net10.0`, no database and no network. The four corpus tests skip
-  silently when their files are missing and allow a small mismatch budget (3–10 %), because the
+  silently when their files are missing and allow a small mismatch budget (2–10 %), because the
   external corpora contain dialectal, obsolete and suppletive forms the dictionaries regularise.
   Run them with `pwsh -NoProfile -ExecutionPolicy Bypass -File util-scripts/test.ps1`.
 
