@@ -4,7 +4,8 @@ using System.Text;
 using System.Linq;
 using System.IO;
 using System.Threading.Tasks;
-using Newtonsoft.Json;
+using System.Text.Json;
+using System.Text.Encodings.Web;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input.Platform;
@@ -23,8 +24,14 @@ namespace Cyriller.Desktop.ViewModels
         protected string searchResultTitle = null;
         protected string inputText;
 
+        protected static readonly JsonSerializerOptions JsonOptions = new JsonSerializerOptions
+        {
+            WriteIndented = true,
+            Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+        };
+
         public Application Application { get; protected set; }
-        public IClipboard Clipboard => Application.Clipboard;
+        public IClipboard Clipboard => DesktopServices.Clipboard;
 
         public DeclineViewModel(Application application)
         {
@@ -110,7 +117,7 @@ namespace Cyriller.Desktop.ViewModels
 
         public virtual async void ExportToJson()
         {
-            string fileName = await this.Application.MainWindow.SaveFileDialog("Сохранить результат склонения в JSON", "json", "Файлы JSON");
+            string fileName = await DesktopServices.MainWindow.SaveFileDialog("Сохранить результат склонения в JSON", "json", "Файлы JSON");
 
             if (string.IsNullOrEmpty(fileName))
             {
@@ -133,7 +140,7 @@ namespace Cyriller.Desktop.ViewModels
 
         public virtual async void ExportToExcel()
         {
-            string fileName = await this.Application.MainWindow.SaveFileDialog("Сохранить результат склонения в Microsoft Excel документ", "xlsx", "Файлы Microsoft Excel");
+            string fileName = await DesktopServices.MainWindow.SaveFileDialog("Сохранить результат склонения в Microsoft Excel документ", "xlsx", "Файлы Microsoft Excel");
 
             if (string.IsNullOrEmpty(fileName))
             {

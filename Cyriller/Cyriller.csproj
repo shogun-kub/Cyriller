@@ -1,10 +1,10 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.0;net45</TargetFrameworks>
+    <TargetFrameworks>net10.0;netstandard2.1</TargetFrameworks>
     <TargetsForTfmSpecificBuildOutput>$(TargetsForTfmSpecificBuildOutput);CopyProjectReferencesToPackage</TargetsForTfmSpecificBuildOutput>
     <PackageId>Miyconst.Cyriller</PackageId>
-    <Version>0.1.1</Version>
+    <Version>0.2.0</Version>
     <Description>Библиотека для склонения существительных, прилагательных, чисел и личных имен русского языка по падежам.</Description>
     <Company>http://www.miyconst.com/</Company>
     <Copyright>Copyright © Konstantin Mi 2014-2020</Copyright>
@@ -14,7 +14,7 @@
     <PackageIconUrl>https://raw.githubusercontent.com/miyconst/Cyriller/master/Cyriller.Web/favicon.ico</PackageIconUrl>
     <Authors>Konstantin Mi (miyconst)</Authors>
     <PackageTags>склонение существительное прилагательное число имя падеж</PackageTags>
-    <PackageReleaseNotes>Улучшена работа класса CyrName для склонения имен иностранного происхождения с 'оглы' и 'кызы', без использования словаря.</PackageReleaseNotes>
+    <PackageReleaseNotes>Целевые платформы — .NET 10 и .NET Standard 2.1; поиск существительного по словарю теперь возвращает определённый род.</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>
@@ -28,41 +28,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Properties\" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="12.0.1" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\Cyriller.Model\Cyriller.Model.csproj" PrivateAssets="All"></ProjectReference>
     <ProjectReference Include="..\Cyriller.Rule\Cyriller.Rule.csproj" PrivateAssets="All"></ProjectReference>
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Update="App_Data\adjectives.tt">
-      <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>adjectives.txt</LastGenOutput>
-    </None>
-    <None Update="App_Data\adjectives.txt">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>adjectives.tt</DependentUpon>
-    </None>
-    <None Update="App_Data\nouns.tt">
-      <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>nouns.txt</LastGenOutput>
-    </None>
-    <None Update="App_Data\nouns.txt">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>nouns.tt</DependentUpon>
-    </None>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
   </ItemGroup>
 
   <Target Name="PreBuild" BeforeTargets="PreBuildEvent">

@@ -4,14 +4,14 @@ using Avalonia.Markup.Xaml;
 
 namespace Cyriller.Desktop.Views
 {
-    public class NumberView : UserControl
+    public partial class NumberView : UserControl
     {
         public NumberView()
         {
             this.InitializeComponent();
         }
 
-        public new void Focus()
+        public void FocusInput()
         {
             base.Focus();
             this.FindControl<NumericUpDown>("txtInputValue").Focus();

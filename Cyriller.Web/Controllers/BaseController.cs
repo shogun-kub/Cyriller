@@ -1,14 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using System.Web.Mvc;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Cyriller.Web.Controllers
 {
     public abstract class BaseController : Controller
     {
-        public ActionResult NotFound()
+        public IActionResult NotFoundView()
         {
             Response.StatusCode = 404;
 

@@ -5,14 +5,14 @@ using Cyriller.Desktop.ViewModels;
 
 namespace Cyriller.Desktop.Views
 {
-    public class NameView : UserControl
+    public partial class NameView : UserControl
     {
         public NameView()
         {
             this.InitializeComponent();
         }
 
-        public new void Focus()
+        public void FocusInput()
         {
             base.Focus();
 

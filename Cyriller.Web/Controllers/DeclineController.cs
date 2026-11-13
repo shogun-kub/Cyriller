@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
-using System.Web.Mvc;
 using System.IO;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using OfficeOpenXml;
 using Cyriller.Model;
 using Cyriller.Web.Models;
@@ -13,9 +14,19 @@ namespace Cyriller.Web.Controllers
     public class DeclineController : BaseController
     {
         protected int MaxPhrasesToDecline = 50;
-        protected string TempFolder = Path.Combine(HttpRuntime.AppDomainAppPath, "Temp");
 
-        [GzipFilter]
+        private readonly IWebHostEnvironment environment;
+        private readonly CyrNounCollection nounCollection;
+        private readonly CyrAdjectiveCollection adjectiveCollection;
+
+        public DeclineController(IWebHostEnvironment environment, CyrNounCollection nounCollection, CyrAdjectiveCollection adjectiveCollection)
+        {
+            this.environment = environment;
+            this.nounCollection = nounCollection;
+            this.adjectiveCollection = adjectiveCollection;
+        }
+
+        protected string TempFolder => Path.Combine(this.environment.ContentRootPath, "Temp");
         public ActionResult Noun(string w)
         {
             ViewBag.Page = "Decline.Noun";
@@ -70,8 +81,6 @@ namespace Cyriller.Web.Controllers
 
             return View();
         }
-
-        [GzipFilter]
         public ActionResult Adjective(string w)
         {
             ViewBag.Page = "Decline.Adjective";
@@ -127,8 +136,6 @@ namespace Cyriller.Web.Controllers
 
             return View();
         }
-
-        [GzipFilter]
         public ActionResult Phrase(string w)
         {
             ViewBag.Page = "Decline.Phrase";
@@ -162,8 +169,6 @@ namespace Cyriller.Web.Controllers
 
             return View();
         }
-
-        [GzipFilter]
         public ActionResult Number(string w, string a, string i)
         {
             ViewBag.Page = "Decline.Number";
@@ -258,16 +263,12 @@ namespace Cyriller.Web.Controllers
 
             return View();
         }
-
-        [GzipFilter]
         public ActionResult List()
         {
             ViewBag.Page = "Decline.List";
 
             return View();
         }
-
-        [GzipFilter]
         [HttpPost]
         public ActionResult List(string w)
         {
@@ -324,8 +325,6 @@ namespace Cyriller.Web.Controllers
 
             return View();
         }
-
-        [GzipFilter]
         public ActionResult File()
         {
             ViewBag.Page = "Decline.File";
@@ -339,9 +338,9 @@ namespace Cyriller.Web.Controllers
             ViewBag.Page = "Decline.File";
             ViewBag.Plural = Plural;
 
-            HttpPostedFileBase file = Request.Files["w"];
+            IFormFile file = this.Request.Form.Files["w"];
 
-            if (file == null || file.ContentLength <= 0)
+            if (file == null || file.Length <= 0)
             {
                 ViewBag.Errors = new string[] { "Необходимо выбрать файл для склонения!" };
                 return View();
@@ -381,13 +380,13 @@ namespace Cyriller.Web.Controllers
             return View();
         }
 
-        protected void DeclineExcelFile(HttpPostedFileBase File, bool Plural)
+        protected void DeclineExcelFile(IFormFile File, bool Plural)
         {
             ExcelPackage package;
 
             try
             {
-                package = new ExcelPackage(File.InputStream);
+                package = new ExcelPackage(File.OpenReadStream());
             }
             catch
             {
@@ -452,14 +451,14 @@ namespace Cyriller.Web.Controllers
             ViewBag.ErrorPhrases = errorPhrases;
         }
 
-        protected void DeclineTextFile(HttpPostedFileBase File, bool Plural)
+        protected void DeclineTextFile(IFormFile File, bool Plural)
         {
             string name = Guid.NewGuid() + ".txt";
             string path = Path.Combine(TempFolder, name);
             CyrDeclineCase[] cases = CyrDeclineCase.GetEnumerable().ToArray();
             CyrPhrase phrase = new CyrPhrase(NounCollection, AdjectiveCollection);
 
-            TextReader reader = new StreamReader(File.InputStream, true);
+            TextReader reader = new StreamReader(File.OpenReadStream(), true);
             TextWriter writer = new StreamWriter(path, false, System.Text.Encoding.UTF8);
             string line = reader.ReadLine();
             int totalPhrases = 0;
@@ -524,42 +523,8 @@ namespace Cyriller.Web.Controllers
             ViewBag.ErrorPhrases = errorPhrases;
         }
 
-        protected CyrNounCollection NounCollection
-        {
-            get
-            {
-                CyrNounCollection collection = System.Runtime.Caching.MemoryCache.Default.Get("CyrNounCollection") as CyrNounCollection;
+        protected CyrNounCollection NounCollection => this.nounCollection;
 
-                if (collection != null)
-                {
-                    return collection;
-                }
-
-                collection = new CyrNounCollection();
-
-                System.Runtime.Caching.MemoryCache.Default.Set("CyrNounCollection", collection, DateTime.Now.AddMonths(1));
-
-                return collection;
-            }
-        }
-
-        protected CyrAdjectiveCollection AdjectiveCollection
-        {
-            get
-            {
-                CyrAdjectiveCollection collection = System.Runtime.Caching.MemoryCache.Default.Get("CyrAdjectiveCollection") as CyrAdjectiveCollection;
-
-                if (collection != null)
-                {
-                    return collection;
-                }
-
-                collection = new CyrAdjectiveCollection();
-
-                System.Runtime.Caching.MemoryCache.Default.Set("CyrAdjectiveCollection", collection, DateTime.Now.AddMonths(1));
-
-                return collection;
-            }
-        }
+        protected CyrAdjectiveCollection AdjectiveCollection => this.adjectiveCollection;
     }
 }

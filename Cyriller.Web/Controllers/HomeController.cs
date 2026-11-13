@@ -1,74 +1,75 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using System.Web.Mvc;
-using System.IO;
-using System.Text;
 using Cyriller.Model;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Cyriller.Web.Controllers
 {
     public class HomeController : BaseController
     {
-        [GzipFilter]
-        public ActionResult Index()
+        private readonly Microsoft.AspNetCore.Hosting.IWebHostEnvironment environment;
+
+        public HomeController(Microsoft.AspNetCore.Hosting.IWebHostEnvironment environment)
+        {
+            this.environment = environment;
+        }
+
+        [HttpGet("/")]
+        public IActionResult Index()
         {
             ViewBag.Page = "Home.Index";
 
             return View();
         }
 
-        public ActionResult Decline()
+        [HttpGet("/Decline")]
+        public IActionResult Decline()
         {
-            return new RedirectResult("~/Decline/Phrase", true);
+            return RedirectPermanent("/Decline/Phrase");
         }
 
-        [GzipFilter]
-        public ActionResult Download()
+        [HttpGet("/Download")]
+        public IActionResult Download()
         {
             ViewBag.Page = "Home.Download";
 
             return View();
         }
 
-        [GzipFilter]
-        public ActionResult DownloadFile(string ID)
+        [HttpGet("/DownloadFile/{ID}")]
+        public IActionResult DownloadFile(string ID)
         {
             ViewBag.Page = "Home.Download";
 
-            string path = Path.Combine(HttpRuntime.AppDomainAppPath, "Files", ID);
-            FileInfo fi = new FileInfo(path);
+            string path = System.IO.Path.Combine(this.environment.ContentRootPath, "Files", ID);
 
-            if (!fi.Exists)
+            if (!System.IO.File.Exists(path))
             {
-                return this.NotFound();
+                return this.NotFoundView();
             }
 
             ViewBag.ID = ID;
-            ViewBag.Url = UrlHelper.GenerateContentUrl("~/Files/" + ID, Request.RequestContext.HttpContext);
+            ViewBag.Url = this.Url.Content("~/Files/" + ID);
 
             return View();
         }
 
-        [GzipFilter]
-        public ActionResult Contacts()
+        [HttpGet("/Contacts")]
+        public IActionResult Contacts()
         {
             ViewBag.Page = "Home.Contacts";
 
             return View();
         }
 
-        [GzipFilter]
-        public ActionResult Thanks()
+        [HttpGet("/Thanks")]
+        public IActionResult Thanks()
         {
             ViewBag.Page = "Home.Thanks";
 
             return View();
         }
 
-        [GzipFilter]
-        public ActionResult News()
+        [HttpGet("/News")]
+        public IActionResult News()
         {
             ViewBag.Page = "Home.News";
 

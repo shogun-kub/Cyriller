@@ -7,6 +7,7 @@ using Avalonia;
 using Avalonia.Input;
 using ReactiveUI;
 using Cyriller.Desktop.Models;
+using Cyriller.Desktop.Views;
 
 namespace Cyriller.Desktop.ViewModels
 {
@@ -100,7 +101,7 @@ namespace Cyriller.Desktop.ViewModels
 
         public virtual void MenuItem_Exit_Click()
         {
-            Application.Current.Exit();
+            DesktopServices.Shutdown();
         }
 
         public virtual async void MenuItem_Decline_Noun_Click()
@@ -204,7 +205,7 @@ namespace Cyriller.Desktop.ViewModels
 
         public void CopyToClipboard(string value)
         {
-            this.Application.Clipboard.SetTextAsync(value);
+            DesktopServices.Clipboard?.SetTextAsync(value);
         }
 
         protected virtual void HideAll()

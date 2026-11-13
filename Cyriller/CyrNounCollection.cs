@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -115,7 +115,21 @@ namespace Cyriller
         /// <returns></returns>
         public CyrNoun Get(string word, out CasesEnum @case, out NumbersEnum number)
         {
-            CyrNoun noun = this.GetOrDefault(word, out @case, out number);
+            return this.Get(word, out @case, out number, out _);
+        }
+
+        /// <summary>
+        /// Поиск существительного по точному совпадению с автоматическим определением рода, падежа и числа.
+        /// Выбрасывает <see cref="CyrWordNotFoundException"/> если слово не было найдено.
+        /// </summary>
+        /// <param name="word">Существительное в любом роде, числе и падеже.</param>
+        /// <param name="case">Падеж найденного существительного.</param>
+        /// <param name="number">Число найденного существительного.</param>
+        /// <param name="gender">Род найденного существительного.</param>
+        /// <returns></returns>
+        public CyrNoun Get(string word, out CasesEnum @case, out NumbersEnum number, out GendersEnum gender)
+        {
+            CyrNoun noun = this.GetOrDefault(word, out @case, out number, out gender);
 
             if (noun == null)
             {
@@ -153,6 +167,20 @@ namespace Cyriller
         /// <param name="word">Существительное в любом роде, числе и падеже.</param>
         /// <param name="number">Число найденного существительного.</param>
         /// <param name="case">Падеж найденного существительного.</param>
+        /// <returns></returns>
+        public CyrNoun GetOrDefault(string word, out CasesEnum @case, out NumbersEnum number)
+        {
+            return this.GetOrDefault(word, out @case, out number, out _);
+        }
+
+        /// <summary>
+        /// Поиск существительного по точному совпадению с автоматическим определением рода, падежа и числа.
+        /// Возвращает null если слово не было найдено.
+        /// </summary>
+        /// <param name="word">Существительное в любом роде, числе и падеже.</param>
+        /// <param name="case">Падеж найденного существительного.</param>
+        /// <param name="number">Число найденного существительного.</param>
+        /// <param name="gender">Род найденного существительного.</param>
         /// <returns></returns>
         public CyrNoun GetOrDefault(string word, out CasesEnum @case, out NumbersEnum number, out GendersEnum gender)
         {

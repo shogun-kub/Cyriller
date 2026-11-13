@@ -1,9 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.0;net45</TargetFrameworks>
-    <Version>0.1.1</Version>
-    <AssemblyVersion>0.1.1.0</AssemblyVersion>
+    <TargetFrameworks>net10.0;netstandard2.1</TargetFrameworks>
+    <Version>0.2.0</Version>
+    <AssemblyVersion>0.2.0.0</AssemblyVersion>
     <Authors>Konstantin Mi (miyconst)</Authors>
     <Company>http://www.miyconst.com/</Company>
     <Description>Russian language declension library</Description>

@@ -1,4 +1,4 @@
-﻿@{
+@{
     ViewBag.Title = "Главная";
 }
 
@@ -38,9 +38,7 @@
     Если вы хотите ускорить развитие проекта, то вы можете пожертвовать любую сумму на мой PayPal или Яндекс кошелек.
     Если вы программист и хотите помочь в разработке проекта, то свяжитесь со мной любым удобным <a href="@Url.Content("~/Contacts")" rel="nofollow" target="_blank">способом</a>.
 </p>
-@{
-    Html.RenderPartial("_Donate", null);
-}
+<partial name="_Donate" />
 <fieldset>
     <legend>Склонять:</legend>
     <form action="@Url.Content("~/Decline/Noun")" method="get" class="form-horizontal decline-form">

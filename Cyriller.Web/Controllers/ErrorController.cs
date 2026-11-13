@@ -1,25 +1,27 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using System.Web.Mvc;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Cyriller.Web.Controllers
 {
     public class ErrorController : Controller
     {
-        public ActionResult p404()
+        public IActionResult p404()
         {
+            Response.StatusCode = 404;
+
             return View();
         }
 
-        public ActionResult p403()
+        public IActionResult p403()
         {
+            Response.StatusCode = 403;
+
             return View();
         }
 
-        public ActionResult p500()
+        public IActionResult p500()
         {
+            Response.StatusCode = 500;
+
             return View();
         }
     }

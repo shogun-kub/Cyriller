@@ -15,8 +15,8 @@ Cyriller - бесплатная программа склонения по па�
 
 ## Как собрать
 
-- Сборка всех проектов работает на Windows, под [Visual Studio](https://visualstudio.microsoft.com/downloads/) версии 2017 и 2019.
-- Сборка `Cyriller` и `Cyriller.Samples` так же работает и запускается под Linux ([Ubuntu](https://ubuntu.com/download) 18.04 LTS), после установки .NET Core 3.0.
+- Для сборки нужен [.NET 10 SDK](https://dotnet.microsoft.com/download/dotnet/10.0) (проверено на `10.0.404`).
+- Библиотека, `Cyriller.Samples`, `Cyriller.Web` и `Cyriller.Desktop` собираются и под Windows, и под Linux. `Cyriller.Checker` использует WinForms и собирается только под Windows.
 
 ### Проект `Cyriller`
 
@@ -28,49 +28,42 @@ Cyriller - бесплатная программа склонения по па�
 
 #### Target Frameworks
 
-- `netstandard2.0`.
-- `net45`.
+- `net10.0`.
+- `netstandard2.1`.
 
-То есть, может быть использован в проектах под управлением:
-
-- [.NET Framework](https://dotnet.microsoft.com/download/dotnet-framework) версии 4.5 и выше.
-- [.NET Core](https://dotnet.microsoft.com/download) версии 2.0 и выше.
+То есть, может быть использован в проектах под управлением .NET 10 и в проектах на .NET Standard 2.1.
 
 *Больше о `netstandard` - [.NET Standard](https://docs.microsoft.com/en-us/dotnet/standard/net-standard).*
 
 #### Сборка
 
-Вначале необходимо собрать проект `Cyriller.Zipper`, он используется на стадии компиляции для упаковки словарей.
-Проект `Cyriller.Zipper` требует .NET Core 3.0 последней версии. На момент написания это `3.0.100-preview7-012821`.
+Проект `Cyriller.Zipper` упаковывает словари на стадии компиляции и собирается автоматически вместе с решением.
 
 #### Сборка при помощи dotnet CLI
 
 ```
-git clone https://github.com/miyconst/Cyriller
+git clone https://github.com/shogun-kub/Cyriller
 cd Cyriller
-cd Cyriller.Zipper
-dotnet build
-cd ..
-cd Cyriller.Samples
-dotnet build
-dotnet run
+dotnet build Cyriller.sln
+dotnet test Cyriller.Tests\Cyriller.Tests.csproj
+dotnet run --project Cyriller.Samples
 ```
 
 ### Проект `Cyriller.Checker`
 
-.NET Framework 4.5 Windows Forms приложение для визуальной проверки работы. Для полной работы приложения требуется развернуть [MS-SQL базу данных](http://cyriller.1gb.ru/Download) и настроить подключение.
+.NET 10 Windows Forms приложение для визуальной проверки работы. Подключение к базе данных больше не требуется.
 
 ### Проект `Cyriller.Samples`
 
-.NET Core 3.0 Console Application с примерами использования Cyriller.
+.NET 10 Console Application с примерами использования Cyriller.
 
 ### Проект `Cyriller.Web`
 
-.NET Framework 4.5 ASP.NET MVC вэб-сайт с демонстрацией возможностей Cyriller.
+ASP.NET Core MVC вэб-сайт с демонстрацией возможностей Cyriller.
 
 ### Проект `Cyriller.Zipper`
 
-Служебное .NET Core 3.0 Console Application для упаковки словарей Cyriller на стадии компиляции.
+Служебное .NET 10 Console Application для упаковки словарей Cyriller на стадии компиляции.
 
 ## Как пользоваться
 

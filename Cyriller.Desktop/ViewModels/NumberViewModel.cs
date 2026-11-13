@@ -5,7 +5,7 @@ using System.Text;
 using Avalonia;
 using ReactiveUI;
 using OfficeOpenXml;
-using Newtonsoft.Json;
+using System.Text.Json;
 using Cyriller.Desktop.Models;
 
 namespace Cyriller.Desktop.ViewModels
@@ -189,7 +189,7 @@ namespace Cyriller.Desktop.ViewModels
                 this.DeclineResult
             };
 
-            string json = JsonConvert.SerializeObject(export, Formatting.Indented);
+            string json = JsonSerializer.Serialize(export, JsonOptions);
 
             return json;
         }

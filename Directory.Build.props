@@ -1,0 +1,22 @@
+<Project>
+
+  <PropertyGroup>
+    <LangVersion>latest</LangVersion>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <Deterministic>true</Deterministic>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+    <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
+  </PropertyGroup>
+
+  <!--
+    DSH runs shell commands inside a restricted, low-integrity sandbox that has no route to
+    nuget.org. Disable package auditing there so restore never fails on it, and turn off the
+    testhost parent-process watch that the restricted token cannot satisfy.
+  -->
+  <PropertyGroup Condition="'$(DSH_SHELL)' == '1' or '$(DSH_SESSION_ID)' != ''">
+    <NuGetAudit>false</NuGetAudit>
+    <_MSTestEnableParentProcessQuery>false</_MSTestEnableParentProcessQuery>
+  </PropertyGroup>
+
+</Project>

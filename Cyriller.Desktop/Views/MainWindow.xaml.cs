@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Linq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -9,7 +9,7 @@ using Cyriller.Desktop.ViewModels;
 
 namespace Cyriller.Desktop.Views
 {
-    public class MainWindow : Window
+    public partial class MainWindow : Window
     {
         protected int FocusTimeout { get; set; } = 1;
 
@@ -29,35 +29,35 @@ namespace Cyriller.Desktop.Views
         {
             // This delay is needed to focus element after UI is updated.
             await Task.Delay(this.FocusTimeout);
-            this.Find<PhraseView>("ucPhrase").Focus();
+            this.FindControl<PhraseView>("ucPhrase").FocusInput();
         }
 
         private async void DataContext_NumberFormOpened(object sender, EventArgs e)
         {
             // This delay is needed to focus element after UI is updated.
             await Task.Delay(this.FocusTimeout);
-            this.Find<NumberView>("ucNumber").Focus();
+            this.FindControl<NumberView>("ucNumber").FocusInput();
         }
 
         private async void DataContext_NameFormOpened(object sender, EventArgs e)
         {
             // This delay is needed to focus element after UI is updated.
             await Task.Delay(this.FocusTimeout);
-            this.Find<NameView>("ucName").Focus();
+            this.FindControl<NameView>("ucName").FocusInput();
         }
 
         private async void DataContext_AdjectiveFormOpened(object sender, EventArgs e)
         {
             // This delay is needed to focus element after UI is updated.
             await Task.Delay(this.FocusTimeout);
-            this.Find<AdjectiveView>("ucAdjective").Focus();
+            this.FindControl<AdjectiveView>("ucAdjective").FocusInput();
         }
 
         private async void DataContext_NounFormOpened(object sender, EventArgs e)
         {
             // This delay is needed to focus element after UI is updated.
             await Task.Delay(this.FocusTimeout);
-            this.Find<NounView>("ucNoun").Focus();
+            this.FindControl<NounView>("ucNoun").FocusInput();
         }
 
         private void InitializeComponent()

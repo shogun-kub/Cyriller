@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.Concurrent;
 using System.ComponentModel;
@@ -9,14 +9,20 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.IO;
-using Newtonsoft.Json;
+using System.Text.Json;
+using System.Text.Encodings.Web;
 using Cyriller.Model;
-using Cyriller.Checker.Model;
 
 namespace Cyriller.Checker
 {
     public partial class JsonForm : UserControl
     {
+        private static readonly JsonSerializerOptions JsonOptions = new JsonSerializerOptions
+        {
+            WriteIndented = true,
+            Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+        };
+
         public JsonForm()
         {
             InitializeComponent();
@@ -74,7 +80,7 @@ namespace Cyriller.Checker
                 words.Add(result);
             });
 
-            string json = JsonConvert.SerializeObject(words.OrderBy(x => x[nameof(CyrNoun.Name)]), Formatting.Indented);
+            string json = JsonSerializer.Serialize(words.OrderBy(x => x[nameof(CyrNoun.Name)]), JsonOptions);
 
             this.WriteToFile(json, filePath);
             this.Cursor = Cursors.Default;
@@ -109,7 +115,7 @@ namespace Cyriller.Checker
                 words.Add(result);
             });
 
-            string json = JsonConvert.SerializeObject(words.OrderBy(x => x[nameof(CyrAdjective.Name)]), Formatting.Indented);
+            string json = JsonSerializer.Serialize(words.OrderBy(x => x[nameof(CyrAdjective.Name)]), JsonOptions);
 
             this.WriteToFile(json, filePath);
             this.Cursor = Cursors.Default;

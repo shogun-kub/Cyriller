@@ -9,14 +9,14 @@ using Cyriller.Desktop.ViewModels;
 
 namespace Cyriller.Desktop.Views
 {
-    public class NounView : UserControl
+    public partial class NounView : UserControl
     {
         public NounView()
         {
             this.InitializeComponent();
         }
 
-        public new void Focus()
+        public void FocusInput()
         {
             base.Focus();
             this.FindControl<TextBox>("txtInputText").Focus();

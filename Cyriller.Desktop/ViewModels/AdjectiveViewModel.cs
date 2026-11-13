@@ -4,7 +4,7 @@ using System.Text;
 using System.Linq;
 using System.IO;
 using System.Threading.Tasks;
-using Newtonsoft.Json;
+using System.Text.Json;
 using Avalonia;
 using Avalonia.Controls;
 using ReactiveUI;
@@ -160,7 +160,7 @@ namespace Cyriller.Desktop.ViewModels
                 this.DeclineResult
             };
 
-            string json = JsonConvert.SerializeObject(export, Formatting.Indented);
+            string json = JsonSerializer.Serialize(export, JsonOptions);
 
             return json;
         }

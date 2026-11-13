@@ -1,4 +1,4 @@
-﻿@using Cyriller;
+@using Cyriller;
 @{
     string text = ViewBag.Text;
     string h;
@@ -42,13 +42,13 @@
             </div>
             <div class="col-sm-3">
                 <select class="form-control" name="a" id="ddlAction">
-                    <option value="Item" @(ViewBag.Action == "Item" ? "selected" : string.Empty)>Единица измерения</option>
-                    <option value="Masculine" @(ViewBag.Action == "Masculine" ? "selected" : string.Empty)>Мужской род</option>
-                    <option value="Feminine" @(ViewBag.Action == "Feminine" ? "selected" : string.Empty)>Женский род</option>
-                    <option value="Rub" @(ViewBag.Action == "Rub" ? "selected" : string.Empty)>Рубли</option>
-                    <option value="Usd" @(ViewBag.Action == "Usd" ? "selected" : string.Empty)>Доллары</option>
-                    <option value="Eur" @(ViewBag.Action == "Eur" ? "selected" : string.Empty)>Евро</option>
-                    <option value="Yuan" @(ViewBag.Action == "Yuan" ? "selected" : string.Empty)>Юани</option>
+                    <option value="Item" selected="@(Convert.ToString(ViewBag.Action) == "Item")">Единица измерения</option>
+                    <option value="Masculine" selected="@(Convert.ToString(ViewBag.Action) == "Masculine")">Мужской род</option>
+                    <option value="Feminine" selected="@(Convert.ToString(ViewBag.Action) == "Feminine")">Женский род</option>
+                    <option value="Rub" selected="@(Convert.ToString(ViewBag.Action) == "Rub")">Рубли</option>
+                    <option value="Usd" selected="@(Convert.ToString(ViewBag.Action) == "Usd")">Доллары</option>
+                    <option value="Eur" selected="@(Convert.ToString(ViewBag.Action) == "Eur")">Евро</option>
+                    <option value="Yuan" selected="@(Convert.ToString(ViewBag.Action) == "Yuan")">Юани</option>
                 </select>
             </div>
             <div class="col-sm-3">

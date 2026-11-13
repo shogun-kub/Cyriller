@@ -2,47 +2,39 @@
 using System.Globalization;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
 using Avalonia;
-using Avalonia.Controls;
-using Avalonia.Logging.Serilog;
-using Avalonia.Input.Platform;
+using Avalonia.ReactiveUI;
+using Microsoft.Extensions.DependencyInjection;
 using Cyriller.Desktop.ViewModels;
 using Cyriller.Desktop.Views;
 using Cyriller.Desktop.Models;
+using Avalonia.Markup.Xaml;
 
 namespace Cyriller.Desktop
 {
     public class Program
     {
-        public static ServiceProvider ServiceProvider { get; private set; }
+        public static ServiceProvider ServiceProvider { get; set; }
 
-        // Initialization code. Don't use any Avalonia, third-party APIs or any
-        // SynchronizationContext-reliant code before AppMain is called: things aren't initialized
-        // yet and stuff might break.
         public static void Main(string[] args)
         {
             SetupCultureInfo();
             SetupExceptionHandling();
 
-            BuildAvaloniaApp().Start(AppMain, args);
+            BuildAvaloniaApp().StartWithClassicDesktopLifetime(args);
         }
 
-        // Avalonia configuration, don't remove; also used by visual designer.
+        // Avalonia configuration, don't remove; also used by the visual designer.
         public static AppBuilder BuildAvaloniaApp()
             => AppBuilder.Configure<App>()
                 .UsePlatformDetect()
-                .UseDataGrid()
-                .LogToDebug()
+                .LogToTrace()
                 .UseReactiveUI();
 
-        // Your application's entry point. Here you can initialize your MVVM framework, DI
-        // container, etc.
-        private static void AppMain(Application app, string[] args)
+        public static ServiceProvider BuildServiceProvider(Application app)
         {
             ServiceProvider = new ServiceCollection()
                 .AddSingleton<Application>(app)
-                .AddSingleton<IClipboard>(app.Clipboard)
                 .AddSingleton<CyrCollectionContainer>()
                 .AddTransient<CyrName>()
                 .AddTransient<CyrNumber>()
@@ -58,9 +50,7 @@ namespace Cyriller.Desktop
 
                 .BuildServiceProvider();
 
-            MainWindow window = ServiceProvider.GetService<MainWindow>();
-
-            app.Run(window);
+            return ServiceProvider;
         }
 
         private static void SetupExceptionHandling()
@@ -72,7 +62,7 @@ namespace Cyriller.Desktop
 
             TaskScheduler.UnobservedTaskException += (s, e) =>
             {
-                LogUnhandledException(e.Exception, $"TaskScheduler.UnobservedTaskException");
+                LogUnhandledException(e.Exception, "TaskScheduler.UnobservedTaskException");
             };
         }
 
@@ -80,8 +70,7 @@ namespace Cyriller.Desktop
         {
             Logger logger = new Logger();
             logger.LogException(exception, source);
-            App.Current.Exit();
-            Thread.CurrentThread.Abort();
+            Environment.Exit(1);
         }
 
         private static void SetupCultureInfo()

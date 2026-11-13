@@ -1,23 +1,28 @@
-﻿<!DOCTYPE html>
+@{
+    string shareUrl = $"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}";
+    string page = Convert.ToString(ViewBag.Page) ?? string.Empty;
+}<!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@ViewBag.Title - Кириллер</title>
-    @Styles.Render("~/Content/css")
+    <link rel="stylesheet" href="~/Content/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/Content/font-awesome.min.css" />
+    <link rel="stylesheet" href="~/Content/Site.css" />
 </head>
 <body>
     <div id="body">
         <a id="logo" href="@Url.Content("~/")"></a>
         <nav id="menu">
             <ul>
-                <li class="@(ViewBag.Page == "Home.Index" ? "active" : string.Empty)">
+                <li class="@(page == "Home.Index" ? "active" : string.Empty)">
                     <a href="@Url.Content("~/")">
                         <i class="fa fa-home"></i>
                         Главная
                     </a>
                 </li>
-                <li class="@(ViewBag.Page.StartsWith("Decline.") ? "active" : string.Empty)">
+                <li class="@(page.StartsWith("Decline.") ? "active" : string.Empty)">
                     <a href="@Url.Content("~/Decline/Phrase")">
                         <i class="fa fa-language"></i>
                         Склонять
@@ -43,19 +48,19 @@
                         </li>
                     </ul>
                 </li>
-                <li class="@(ViewBag.Page == "Home.Download" ? "active" : string.Empty)">
+                <li class="@(page == "Home.Download" ? "active" : string.Empty)">
                     <a href="@Url.Content("~/Download")">
                         <i class="fa fa-download"></i>
                         Скачать
                     </a>
                 </li>
-                <li class="@(ViewBag.Page == "Home.News" ? "active" : string.Empty)">
+                <li class="@(page == "Home.News" ? "active" : string.Empty)">
                     <a href="@Url.Content("~/News")">
                         <i class="fa fa-road"></i>
                         Новости
                     </a>
                 </li>
-                <li class="@(ViewBag.Page == "Home.Contacts" ? "active" : string.Empty)">
+                <li class="@(page == "Home.Contacts" ? "active" : string.Empty)">
                     <a href="@Url.Content("~/Contacts")">
                         <i class="fa fa-envelope"></i>
                         Контакты
@@ -131,26 +136,27 @@
             </nav>
             <div>
                 <div id="share-buttons">
-                    <a href="http://www.facebook.com/sharer.php?u=@Request.Url" target="_blank" title="Поделиться в Facebook">
+                    <a href="http://www.facebook.com/sharer.php?u=@shareUrl" target="_blank" title="Поделиться в Facebook">
                         <img src="@Url.Content("~/Content/images/facebook.png")" alt="Facebook" />
                     </a>
-                    <a href="https://plus.google.com/share?url=@Request.Url" target="_blank" title="Поделиться в Google Plus">
+                    <a href="https://plus.google.com/share?url=@shareUrl" target="_blank" title="Поделиться в Google Plus">
                         <img src="@Url.Content("~/Content/images/google.png")" alt="Google" />
                     </a>
-                    <a href="http://www.linkedin.com/shareArticle?mini=true&amp;url=@Request.Url" target="_blank" title="Поделиться в LinkedIn">
+                    <a href="http://www.linkedin.com/shareArticle?mini=true&amp;url=@shareUrl" target="_blank" title="Поделиться в LinkedIn">
                         <img src="@Url.Content("~/Content/images/linkedin.png")" alt="LinkedIn" />
                     </a>
-                    <a href="https://twitter.com/share?url=@Request.Url&amp;text=@ViewBag.Title&amp;hashtags=Cyriller" target="_blank" title="Поделиться через Twitter">
+                    <a href="https://twitter.com/share?url=@shareUrl&amp;text=@ViewBag.Title&amp;hashtags=Cyriller" target="_blank" title="Поделиться через Twitter">
                         <img src="@Url.Content("~/Content/images/twitter.png")" alt="Twitter" />
                     </a>
-                    <a href="http://vkontakte.ru/share.php?url=@Request.Url" target="_blank" title="Поделиться через ВК">
+                    <a href="http://vkontakte.ru/share.php?url=@shareUrl" target="_blank" title="Поделиться через ВК">
                         <img src="@Url.Content("~/Content/images/vk.png")" alt="VK" />
                     </a>
                 </div>
             </div>
         </footer>
     </div>
-    @Scripts.Render("~/bundles/jquery")
+    <script src="~/Scripts/jquery-1.10.2.min.js"></script>
+    <script src="~/Scripts/jquery.validate.min.js"></script>
     @RenderSection("scripts", required: false)
 </body>
 </html>
