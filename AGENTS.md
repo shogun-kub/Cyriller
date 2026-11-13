@@ -24,15 +24,21 @@ The **library** is the deliverable. `Cyriller.Samples`, `Cyriller.Checker`, `Cyr
 [`PROJECT_STRUCTURE.md`](PROJECT_STRUCTURE.md) maps every project, file and data format — read it
 before changing code you have not read.
 
-`Test_data/` holds read-only sample corpora for name and surname testing. It is outside the
+`Test_data/` holds read-only sample corpora for name, noun and phrase testing — surname and name
+lists, Petrovich fixtures, SynTagRus treebanks and a Wiktionary extract. It is outside the
 solution, is not tracked by git, and must never be edited.
 
 ## Current state — 2026-11-13
 
-- **The solution builds and the tests pass on .NET 10.** `dotnet build Cyriller.sln` is clean and
-  `dotnet test` reports 63 passing tests. The library now targets `net10.0` and `netstandard2.1`;
-  Samples, Zipper, DictionaryBuilder, Tests, Web and Desktop are `net10.0`; Checker is
-  `net10.0-windows` (WinForms).
+- **The solution builds and the tests pass on .NET 10.** `util-scripts/build.ps1` and
+  `util-scripts/test.ps1` run clean inside the sandbox (no elevated access): 70 passing tests.
+  The library now targets `net10.0` and `netstandard2.1`; Samples, Zipper, DictionaryBuilder,
+  Tests, Web and Desktop are `net10.0`; Checker is `net10.0-windows` (WinForms).
+- External corpora in `Test_data/` (Petrovich, SynTagRus, the Wiktionary extract) are now used by
+  `PetrovichTests`, `UdNounTests`, `KaikkiNounTests` and `NameDeclensionTests`; each test skips
+  silently when its data is absent.
+- A surname/name bug was fixed on the way: feminine and masculine names in `-ша` took `-ы` in the
+  genitive (`Машы`) instead of `-и` (`Маши`); see `NameEndingInShaTakesИInGenitive`.
 - `CyrNounCollection.GetOrDefault` gained an `out GendersEnum gender` overload (and `Get` has a
   matching one), so callers can tell which gender the dictionary resolved; the three-argument
   overloads are kept for compatibility.
@@ -101,21 +107,31 @@ solution, is not tracked by git, and must never be edited.
 | Visual Studio | Community 2022, Build Tools 2022, Community 2026 (MSBuild `18.11.1`); no longer required for the solution |
 | Network | Blocked inside the sandbox; reachable only from an approved `danger-full-access` run, which package restore needs |
 | NuGet cache | `C:\Users\shogu\.nuget\packages`; Avalonia 11, EPPlus 4.5.3.2 and xunit 2.9.3 were restored from nuget.org |
-| File sandbox | Project files are writable in both modes (full access and low labels were applied to the tree). Build outputs created by unconfined builds are not low-label, so `dotnet build`/`dotnet test` need an approved `danger-full-access` run |
+| File sandbox | `workspace-write` covers the whole tree: builds and tests run confined through `util-scripts/build.ps1` and `util-scripts/test.ps1`. `danger-full-access` is needed only when a restore has to reach nuget.org (a package version missing from the cache) |
 | ACL record | `E:\Projects\Cyriller\.acl-recovery\` keeps DACL backups, the low-label script and its log; leave it in place |
 
 ## Building
 
-Everything builds offline once packages are restored; restoring new packages needs an approved
-`danger-full-access` run because the sandbox has no network.
+Build and test run inside the sandbox; elevated access is not needed. Two sandbox rules shape the
+commands:
+
+- MSBuild worker nodes talk over named pipes, which the sandbox forbids, so a multi-node build
+  exits with code 1 and «Ошибок: 0». Always pass `-m:1`.
+- `dotnet test` on the solution hangs for the same reason, and the Avalonia build task writes its
+  telemetry log outside the workspace; [`Directory.Build.targets`](Directory.Build.targets) turns
+  that target off.
 
 ```powershell
-dotnet build Cyriller.sln
-dotnet test Cyriller.Tests\Cyriller.Tests.csproj
+pwsh -NoProfile -ExecutionPolicy Bypass -File util-scripts/build.ps1
+pwsh -NoProfile -ExecutionPolicy Bypass -File util-scripts/test.ps1
 dotnet run --project Cyriller.Samples
 dotnet run --project Cyriller.Web --urls http://127.0.0.1:5199
 dotnet run --project Cyriller.Desktop
 ```
+
+The scripts are thin wrappers around `dotnet build Cyriller.sln -m:1` and a per-project
+`dotnet test --no-build --no-restore`; `-NoRestore`, `-NoBuild`, `-Configuration` and `-Filter` are
+passed through. A restore that pulls new packages needs an approved `danger-full-access` run.
 
 - `Cyriller.Zipper` must be built before `Cyriller` on a clean tree: the library's PreBuild target
   packs `App_Data/*.txt` into `*.gz` with `dotnet run --no-build --project Cyriller.Zipper`.
@@ -126,20 +142,33 @@ dotnet run --project Cyriller.Desktop
 ## Testing
 
 - [`Cyriller.Tests/CyrNameTests.cs`](Cyriller.Tests/CyrNameTests.cs) — full-name declension,
-  shortened forms, patronymic suffixes, hyphenated surnames.
+  shortened forms, patronymic suffixes, hyphenated surnames, names in `-ша`.
 - [`Cyriller.Tests/CyrRuleTests.cs`](Cyriller.Tests/CyrRuleTests.cs) — `CyrRule.Apply`/`Revert`.
 - [`Cyriller.Tests/DictionaryTests.cs`](Cyriller.Tests/DictionaryTests.cs) — dictionary lookups,
   gender resolution, similar-word fallback, adjectives, number spelling.
 - [`Cyriller.Tests/SurnameTests.cs`](Cyriller.Tests/SurnameTests.cs) — surname endings plus a
   smoke sweep over `Test_data/russian_surnames.csv`; it passes silently when `Test_data` is
   absent and skips rows with an embedded ESC byte.
-- 63 tests, xunit 2.9.3 on `net10.0`, no database and no network. Run with
-  `dotnet test Cyriller.Tests\Cyriller.Tests.csproj`.
+- [`Cyriller.Tests/PetrovichTests.cs`](Cyriller.Tests/PetrovichTests.cs) — full-name declension
+  against [Petrovich](https://github.com/petrovich) fixtures (MIT); skips without them.
+- [`Cyriller.Tests/UdNounTests.cs`](Cyriller.Tests/UdNounTests.cs) — noun forms from the
+  SynTagRus UD treebank (CC BY-NC-SA 4.0), up to 4000 tokens.
+- [`Cyriller.Tests/KaikkiNounTests.cs`](Cyriller.Tests/KaikkiNounTests.cs) — noun paradigms from
+  the Wiktionary extract (CC BY-SA 4.0), up to 1200 lemmas from the start of the file.
+- [`Cyriller.Tests/NameDeclensionTests.cs`](Cyriller.Tests/NameDeclensionTests.cs) — 100 sampled
+  «фамилия + имя» pairs (50 male, 50 female) from the CSV and the name lists, checked against the
+  declensions attested in SynTagRus; the seed is fixed, so the sample is reproducible.
+- [`Cyriller.Tests/CorpusFiles.cs`](Cyriller.Tests/CorpusFiles.cs) — locates `Test_data`, shares
+  one noun collection and normalises stress marks and `ё`.
+- 70 tests, xunit 2.9.3 on `net10.0`, no database and no network. The four corpus tests skip
+  silently when their files are missing and allow a small mismatch budget (3–10 %), because the
+  external corpora contain dialectal, obsolete and suppletive forms the dictionaries regularise.
+  Run them with `pwsh -NoProfile -ExecutionPolicy Bypass -File util-scripts/test.ps1`.
 
 ## Workflow
 
-1. **State** — `git status`, then `dotnet build Cyriller.sln` and `dotnet test` to confirm the
-   tree is healthy.
+1. **State** — `git status`, then `pwsh -NoProfile -ExecutionPolicy Bypass -File util-scripts/test.ps1`
+   to confirm the tree is healthy.
 2. **Read** — the class, its dictionary format and its tests before editing. `CyrName.cs` is 2274
    lines of per-case rule tables; read the group you touch.
 3. **Change** — the smallest edit that fixes the behaviour, in the existing style.
@@ -158,11 +187,20 @@ declension quality against, not expected outputs to replay.
 | --- | --- |
 | [`Test_data/russian_surnames.csv`](Test_data/russian_surnames.csv) | 9,498,549 B, UTF-8 without BOM, LF, header `surname_cyrl,surname_latn,gender` then 318,479 rows: Cyrillic surname, Latin transliteration, gender `m`/`f`/`u` (123,401 male, 123,923 female, 71,155 unisex) |
 | [`Test_data/ru-pnames-list/`](Test_data/ru-pnames-list) | Git clone of `Raven-SL/ru-pnames-list` at `48ff79f`: [`lists/male_names_rus.txt`](Test_data/ru-pnames-list/lists/male_names_rus.txt) 736, [`lists/female_names_rus.txt`](Test_data/ru-pnames-list/lists/female_names_rus.txt) 938, [`lists/male_surnames_rus.txt`](Test_data/ru-pnames-list/lists/male_surnames_rus.txt) 14,651 lines — CRLF, UTF-8 without BOM, one name per line, no duplicates |
+| `Test_data/petrovich-rules/` | Petrovich rule tables (MIT): `rules.json` 21 KB, `gender.json` 12 KB; rules only, no expected forms |
+| `Test_data/petrovich-net/` | .NET port NPetrovich; `src/NPetrovich.Tests/Data/*.csv` holds 55 expected name forms (`FirstNames` 14, `MiddleNames` 6, `LastNames` 40 lines) |
+| `Test_data/petrovich.spec.js` | 130 lines with 18 `expect(p.male.first.genitive(...))` style expectations from `petrovich-js` |
+| `Test_data/UD/` | Five SynTagRus `.conllu` files, 141 MB total: dev 14.3 MB, test 14.6 MB, train-a/b/c 39.5/41.5/31.8 MB; 87,337 sentences and 1,515,559 tokens, UD 2.19, **CC BY-NC-SA 4.0** |
+| `Test_data/ru-extract.jsonl` | 2.5 GB raw [wiktextract](https://kaikki.org/) extract of the *Russian Wiktionary*: records for **all languages**, so filter `lang_code == "ru"`; Russian nouns carry full declension tables with stress marks in `forms`; CC BY-SA 4.0 |
 
 The name lists carry names only — no cases, genders or expected forms (see
 [`readme.md`](Test_data/ru-pnames-list/readme.md)) — so they support crash-freedom and
 "is the form plausible" sweeps, not assertions without a source of truth. The CSV does carry
 gender, which makes it the better basis for masculine/feminine/unisex surname checks.
+
+The corpus files are large and licensed, so they stay out of git (`/Test_data` is ignored).
+Never commit them, and keep their licences in mind: SynTagRus is non-commercial, Wiktionary
+extracts are share-alike.
 
 ## Language
 

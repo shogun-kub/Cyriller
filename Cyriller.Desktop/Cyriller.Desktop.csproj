@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
@@ -10,6 +10,12 @@
     <Description>Настольное приложение Кириллер на Avalonia.</Description>
     <Company>http://www.miyconst.com/</Company>
     <Copyright>Copyright © Konstantin Mi 2014-2020</Copyright>
+    <!--
+      MainWindow создаётся через DI и не имеет открытого конструктора без параметров,
+      поэтому загрузчик XAML не смог бы собрать его во время выполнения — предупреждение
+      AVLN3001 ожидаемо и не влияет на приложение.
+    -->
+    <NoWarn>$(NoWarn);AVLN3001</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>

@@ -335,6 +335,7 @@ namespace Cyriller
                         case "ка":
                         case "ха":
                         case "ча":
+                        case "ша":
                         case "ща":
                             name = SetEnd(name, "и");
                             break;

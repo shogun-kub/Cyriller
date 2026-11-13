@@ -6,7 +6,7 @@ connect, and where a given kind of change belongs. It is a companion to
 
 Snapshot: `2026-11-13`, branch `master`, `HEAD` `3657f9e` plus the .NET 10 migration described
 below. The whole solution targets `net10.0` (`netstandard2.1` for the library), and
-`dotnet build Cyriller.sln` plus `dotnet test` (63 tests) pass. `Test_data/` stays read-only.
+`dotnet build Cyriller.sln` plus `util-scripts/test.ps1` (70 tests) pass inside the sandbox.
 
 ## 1. At a glance
 
@@ -23,12 +23,15 @@ below. The whole solution targets `net10.0` (`netstandard2.1` for the library), 
 
 ```
 E:\Projects\Cyriller\Cyriller
-├─ Cyriller.sln                 # the 9 projects below
+├─ Cyriller.sln                 # the 10 projects below
 ├─ README.md                    # user-facing documentation (Russian): build and API guide
 ├─ LICENSE                      # LGPL-3.0
 ├─ CyrName.js                   # 1839-line JavaScript port of the CyrName algorithm
 ├─ AGENTS.md                    # how an agent works in this repository
 ├─ PROJECT_STRUCTURE.md         # this file
+├─ Directory.Build.props        # language level, deterministic build, sandbox switches
+├─ Directory.Build.targets      # disables the Avalonia build-telemetry target (sandbox)
+├─ util-scripts/                # build.ps1 and test.ps1: sandbox-safe build and test entry points
 ├─ .gitignore                   # VS ignores + bin/obj/packages + Temp/ + /Test_data
 ├─ .nuget/                      # NuGet.exe, NuGet.Config, NuGet.targets for the old-style projects
 ├─ packages/                    # old-style restored packages (ignored by git, present on this machine)
@@ -321,18 +324,25 @@ as six-element arrays).
 
 ## 8. `Cyriller.Tests`
 
-`net10.0` project, xunit 2.9.3 + Microsoft.NET.Test.Sdk 17.14.2, 63 tests, no database:
+`net10.0` project, xunit 2.9.3 + Microsoft.NET.Test.Sdk 17.14.2, 70 tests, no database:
 
 | File | Coverage |
 | --- | --- |
-| [`CyrNameTests.cs`](Cyriller.Tests/CyrNameTests.cs) | Full-name declension for both genders, `-Кызы`/`-Оглы` and hyphenated patronymics, shortened names, individual surname/name/patronymic cases, initials |
+| [`CyrNameTests.cs`](Cyriller.Tests/CyrNameTests.cs) | Full-name declension for both genders, `-Кызы`/`-Оглы` and hyphenated patronymics, shortened names, individual surname/name/patronymic cases, initials, names in `-ша` |
 | [`CyrRuleTests.cs`](Cyriller.Tests/CyrRuleTests.cs) | `Apply` and `Revert` for empty, cut-only, add-only, combined and `*` rules |
 | [`DictionaryTests.cs`](Cyriller.Tests/DictionaryTests.cs) | Real dictionary lookups, resolved gender, similar-word fallback, adjectives in all genders, number spelling and unit forms |
 | [`SurnameTests.cs`](Cyriller.Tests/SurnameTests.cs) | Surname endings, hyphenated surnames and a sampled sweep over `Test_data/russian_surnames.csv`; the sweep is skipped when the folder is absent and ignores rows with an embedded ESC byte |
+| [`PetrovichTests.cs`](Cyriller.Tests/PetrovichTests.cs) | 55 name forms from the NPetrovich CSV fixtures and 18 expectations from `petrovich.spec.js`; both skip when absent |
+| [`UdNounTests.cs`](Cyriller.Tests/UdNounTests.cs) | Up to 4000 noun tokens of `ru_syntagrus-ud-test.conllu`: the corpus form must be the one the dictionary gives for the lemma, its case and its number |
+| [`KaikkiNounTests.cs`](Cyriller.Tests/KaikkiNounTests.cs) | Up to 1200 dictionary nouns from the first 400 000 lines of `ru-extract.jsonl`: every Wiktionary form of an attested case/number must match, with stress marks and non-Russian letters filtered out |
+| [`NameDeclensionTests.cs`](Cyriller.Tests/NameDeclensionTests.cs) | 100 sampled surname + given-name pairs (50 male, 50 female, seed `20261113`) declined by `CyrName` and compared with the `Sur`/`Giv` `PROPN` forms attested in SynTagRus; the name type is part of the key, because the same string can be both a surname and a given name |
+| [`CorpusFiles.cs`](Cyriller.Tests/CorpusFiles.cs) | Finds `Test_data` from the build output, shares a single `CyrNounCollection` and normalises `ё` and stress marks |
 
 The EF6 model and the SQL Server fixture were removed together with the old `NounTests`; the
-dictionary checks now run against the embedded resources, so `dotnet test` needs neither a
-database nor network access.
+dictionary checks now run against the embedded resources and the external corpora, so
+`dotnet test` needs neither a database nor network access. The corpus tests allow a small mismatch
+budget (Petrovich 10 %, SynTagRus 5 %, Wiktionary 10 %), because the corpora contain dialectal,
+obsolete and suppletive forms (`человек → людей`, `год → году`) that the dictionaries regularise.
 
 ## 9. `Cyriller.Samples`
 
@@ -407,6 +417,11 @@ implementation to keep in sync, not as a source of truth.
 | --- | --- |
 | [`Test_data/russian_surnames.csv`](Test_data/russian_surnames.csv) | 9,498,549 B, UTF-8 without BOM, LF, no quoting: header `surname_cyrl,surname_latn,gender`, then 318,479 rows — Cyrillic surname, Latin transliteration, `m`/`f`/`u` (123,401 / 123,923 / 71,155) |
 | [`Test_data/ru-pnames-list/`](Test_data/ru-pnames-list) | Separate git clone of `https://github.com/Raven-SL/ru-pnames-list` at `48ff79f`; `readme.md`, empty `.gitignore`, and `lists/` with 736 male names, 938 female names and 14,651 male surnames (CRLF, UTF-8 without BOM, one per line, no duplicates) |
+| `Test_data/petrovich-rules/` | Rule tables of the MIT-licensed [Petrovich](https://github.com/petrovich/petrovich-rules) project (`rules.json` 21 KB, `gender.json` 12 KB); rules only, without expected forms |
+| `Test_data/petrovich-net/` | .NET port NPetrovich; `src/NPetrovich.Tests/Data/*.csv` holds 55 expected forms for first names, patronymics and surnames (`Иван, Male, Genitive, Ивана` style) |
+| `Test_data/petrovich.spec.js` | 130-line Jasmine spec from `petrovich-js` with 18 chained expectations (`expect(p.male.first.genitive('Мария')).toBe('Марии')`) |
+| `Test_data/UD/*.conllu` | Five SynTagRus files (`dev` 14.3 MB, `test` 14.6 MB, `train-a/b/c` 39.5/41.5/31.8 MB), UD 2.19: 87,337 sentences, 1,515,559 tokens, **CC BY-NC-SA 4.0** |
+| `Test_data/ru-extract.jsonl` | 2.5 GB raw [wiktextract](https://kaikki.org/) dump of the Russian Wiktionary (2026-10-30), CC BY-SA 4.0: records for all languages, Russian nouns (`"lang_code": "ru"`) carry full declension tables with stress marks |
 
 Data-quality notes for anyone writing tests over the CSV:
 
@@ -418,8 +433,9 @@ Data-quality notes for anyone writing tests over the CSV:
 - a surname can legitimately appear under more than one gender, so key expectations by
   `(surname_cyrl, gender)`.
 
-The folder is listed in `.gitignore` as `/Test_data` and has no `.gitmodules` entry. Only
-`Cyriller.Tests/SurnameTests.cs` reads it, and only when the folder is present.
+The folder is listed in `.gitignore` as `/Test_data` and has no `.gitmodules` entry. Only the test
+project reads it: `SurnameTests` uses the CSV, `PetrovichTests`, `UdNounTests` and
+`KaikkiNounTests` use the corpora, and every one of them skips silently when its data is absent.
 
 ## 15. Generated, ignored and stale artefacts
 

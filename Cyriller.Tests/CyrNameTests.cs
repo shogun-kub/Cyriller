@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -622,6 +622,31 @@ namespace Cyriller.Tests
                 Assert.Equal("-гызы", suffix);
             }
         }
+
+        #endregion
+        #region Names ending in -ша.
+
+        [Fact]
+        public void NameEndingInShaTakesИInGenitive()
+        {
+            Assert.Equal("Маши", this.CyrName.DeclineNameGenitive("Маша", true, false));
+            Assert.Equal("Даши", this.CyrName.DeclineNameGenitive("Даша", true, false));
+            Assert.Equal("Саши", this.CyrName.DeclineNameGenitive("Саша", true, false));
+            Assert.Equal("Миши", this.CyrName.DeclineNameGenitive("Миша", false, false));
+        }
+
+        [Fact]
+        public void NameEndingInShaTakesЕInInstrumental()
+        {
+            // Имена на -ша безударны: после шипящей пишется «е» (Па́шей), а «о» бывает
+            // только под ударением — у титула «паша́» (пашой) или у нарицательных (свечой).
+            Assert.Equal("Пашей", this.CyrName.DeclineNameInstrumental("Паша", false, false));
+            Assert.Equal("Сашей", this.CyrName.DeclineNameInstrumental("Саша", false, false));
+            Assert.Equal("Гошей", this.CyrName.DeclineNameInstrumental("Гоша", false, false));
+            Assert.Equal("Мишей", this.CyrName.DeclineNameInstrumental("Миша", false, false));
+            Assert.Equal("Дашей", this.CyrName.DeclineNameInstrumental("Даша", true, false));
+        }
+
         #endregion
     }
 }
