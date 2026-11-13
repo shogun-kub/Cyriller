@@ -154,7 +154,7 @@ namespace Cyriller
         /// <param name="number">Число найденного существительного.</param>
         /// <param name="case">Падеж найденного существительного.</param>
         /// <returns></returns>
-        public CyrNoun GetOrDefault(string word, out CasesEnum @case, out NumbersEnum number)
+        public CyrNoun GetOrDefault(string word, out CasesEnum @case, out NumbersEnum number, out GendersEnum gender)
         {
             DictionaryKey key;
             CyrNoun noun;
@@ -174,6 +174,7 @@ namespace Cyriller
                         {
                             @case = key.Case;
                             number = key.Number;
+                            gender = g;
 
                             return noun;
                         }
@@ -183,6 +184,7 @@ namespace Cyriller
 
             @case = 0;
             number = 0;
+            gender = GendersEnum.Undefined;
 
             return null;
         }
