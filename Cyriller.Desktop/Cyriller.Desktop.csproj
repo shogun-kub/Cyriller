@@ -33,6 +33,9 @@
     <PackageReference Include="Avalonia.Controls.DataGrid" Version="11.3.13" />
     <PackageReference Include="Avalonia.ReactiveUI" Version="11.3.9" />
     <PackageReference Include="EPPlus" Version="4.5.3.2" />
+    <!-- EPPlus 4 тянет System.Drawing.Common 4.6.0-preview и Newtonsoft.Json 11.0.2 с уязвимостями; версии ниже перекрывают транзитивные. -->
+    <PackageReference Include="System.Drawing.Common" Version="10.0.15" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.0" />
   </ItemGroup>
 

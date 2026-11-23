@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
@@ -12,6 +12,8 @@
 
   <ItemGroup>
     <PackageReference Include="EPPlus" Version="4.5.3.2" />
+    <!-- EPPlus 4 тянет System.Drawing.Common 4.6.0-preview с уязвимостью; версия ниже перекрывает транзитивную. -->
+    <PackageReference Include="System.Drawing.Common" Version="10.0.15" />
   </ItemGroup>
 
   <ItemGroup>

@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFrameworks>net10.0;netstandard2.1</TargetFrameworks>
@@ -37,7 +37,7 @@
   </ItemGroup>
 
   <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
-    <Exec Command="dotnet run --no-build --no-restore --project $(ProjectDir)..\Cyriller.Zipper\Cyriller.Zipper.csproj $(ProjectDir)App_Data\nouns.txt $(ProjectDir)App_Data\nouns.gz OnlyIfSourceIsNewer&#xD;&#xA;dotnet run --no-build --no-restore --project $(ProjectDir)..\Cyriller.Zipper\Cyriller.Zipper.csproj $(ProjectDir)App_Data\adjectives.txt $(ProjectDir)App_Data\adjectives.gz OnlyIfSourceIsNewer" />
+    <Exec Command="dotnet run -c $(Configuration) --no-restore --project $(ProjectDir)..\Cyriller.Zipper\Cyriller.Zipper.csproj $(ProjectDir)App_Data\nouns.txt $(ProjectDir)App_Data\nouns.gz OnlyIfSourceIsNewer&#xD;&#xA;dotnet run -c $(Configuration) --no-restore --project $(ProjectDir)..\Cyriller.Zipper\Cyriller.Zipper.csproj $(ProjectDir)App_Data\adjectives.txt $(ProjectDir)App_Data\adjectives.gz OnlyIfSourceIsNewer" />
   </Target>
 
   <Target Name="CopyProjectReferencesToPackage" DependsOnTargets="ResolveReferences">
