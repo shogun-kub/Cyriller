@@ -15,7 +15,7 @@ Cyriller is an open-source C# library that puts Russian words into all six gramm
   (`CyrName`).
 
 It is a fork of `miyconst/Cyriller`; `origin` is `git@github.com:shogun-kub/Cyriller.git`.
-License LGPL-3.0 ([`LICENSE`](LICENSE)), NuGet package `Miyconst.Cyriller` 0.2.0, main solution
+License LGPL-3.0 ([`LICENSE`](LICENSE)), NuGet package `ShogunKub.Cyriller` 0.2.0, main solution
 [`Cyriller.sln`](Cyriller.sln).
 
 The **library** is the deliverable. `Cyriller.Samples`, `Cyriller.Checker`, `Cyriller.Web` and
@@ -135,7 +135,7 @@ passed through. A restore that pulls new packages needs an approved `danger-full
 
 - `Cyriller.Zipper` must be built before `Cyriller` on a clean tree: the library's PreBuild target
   packs `App_Data/*.txt` into `*.gz` with `dotnet run --no-build --project Cyriller.Zipper`.
-- Release paths: [`Cyriller/pack.bat`](Cyriller/pack.bat) packs `Miyconst.Cyriller` 0.2.0;
+- Release paths: [`Cyriller/pack.bat`](Cyriller/pack.bat) packs `ShogunKub.Cyriller` 0.2.0;
   [`Cyriller.Desktop/publish.bat`](Cyriller.Desktop/publish.bat) publishes a single-file
   `win-x64` build.
 

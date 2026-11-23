@@ -15,7 +15,7 @@ below. The whole solution targets `net10.0` (`netstandard2.1` for the library), 
 | Solution | [`Cyriller.sln`](Cyriller.sln), Visual Studio 16 format, `Debug|Any CPU` and `Release|Any CPU` |
 | Projects | 10: the library, two supporting `net10.0`/`netstandard2.1` assemblies (Model, Rule), the gzip packer, the dictionary generator, a console demo, tests, and three demos (WinForms, ASP.NET Core MVC, Avalonia 11) |
 | Language / license | C#, LGPL-3.0 ([`LICENSE`](LICENSE)) |
-| Package | `Miyconst.Cyriller` 0.2.0, packed from [`Cyriller/Cyriller.csproj`](Cyriller/Cyriller.csproj) |
+| Package | `ShogunKub.Cyriller` 0.2.0, packed from [`Cyriller/Cyriller.csproj`](Cyriller/Cyriller.csproj) |
 | Upstream | fork of `miyconst/Cyriller`; `origin` `git@github.com:shogun-kub/Cyriller.git` |
 | Data | two dictionaries embedded as gzip resources: nouns and adjectives |
 

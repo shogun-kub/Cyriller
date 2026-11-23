@@ -170,4 +170,4 @@ Cyriller можно протестировать онлайн - [http://cyriller
 
 ## NuGet пакет
 
-https://www.nuget.org/packages/Miyconst.Cyriller
+https://www.nuget.org/packages/ShogunKub.Cyriller

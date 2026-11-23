@@ -3,19 +3,23 @@
   <PropertyGroup>
     <TargetFrameworks>net10.0;netstandard2.1</TargetFrameworks>
     <TargetsForTfmSpecificBuildOutput>$(TargetsForTfmSpecificBuildOutput);CopyProjectReferencesToPackage</TargetsForTfmSpecificBuildOutput>
-    <PackageId>Miyconst.Cyriller</PackageId>
+    <PackageId>ShogunKub.Cyriller</PackageId>
     <Version>0.2.0</Version>
     <Description>Библиотека для склонения существительных, прилагательных, чисел и личных имен русского языка по падежам.</Description>
-    <Company>http://www.miyconst.com/</Company>
+    <Company>https://github.com/shogun-kub</Company>
     <Copyright>Copyright © Konstantin Mi 2014-2020</Copyright>
-    <PackageLicenseUrl>https://github.com/miyconst/Cyriller/blob/master/LICENSE</PackageLicenseUrl>
-    <PackageProjectUrl>https://github.com/miyconst/Cyriller</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/miyconst/Cyriller</RepositoryUrl>
-    <PackageIconUrl>https://raw.githubusercontent.com/miyconst/Cyriller/master/Cyriller.Web/favicon.ico</PackageIconUrl>
-    <Authors>Konstantin Mi (miyconst)</Authors>
+    <PackageLicenseExpression>LGPL-3.0-only</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/shogun-kub/Cyriller</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/shogun-kub/Cyriller</RepositoryUrl>
+    <Authors>Konstantin Mi (miyconst), Mikhail Rozhkov (shogun-kub)</Authors>
     <PackageTags>склонение существительное прилагательное число имя падеж</PackageTags>
-    <PackageReleaseNotes>Целевые платформы — .NET 10 и .NET Standard 2.1; поиск существительного по словарю теперь возвращает определённый род.</PackageReleaseNotes>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageReleaseNotes>Первый выпуск форка: целевые платформы .NET 10 и .NET Standard 2.1; словарь возвращает определённый род существительного; исправлено склонение имён на -ша.</PackageReleaseNotes>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
 
   <ItemGroup>
     <None Remove="App_Data\adjectives.gz" />
