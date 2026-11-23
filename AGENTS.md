@@ -138,6 +138,10 @@ passed through. A restore that pulls new packages needs an approved `danger-full
 - Release paths: [`Cyriller/pack.bat`](Cyriller/pack.bat) packs `ShogunKub.Cyriller` 0.2.0;
   [`Cyriller.Desktop/publish.bat`](Cyriller.Desktop/publish.bat) publishes a single-file
   `win-x64` build.
+- [`.github/workflows/publish.yml`](.github/workflows/publish.yml) packs and pushes on a `v*` tag
+  through NuGet trusted publishing: no API key secret, only `NUGET_USER` (nuget.org profile name)
+  and a policy in nuget.org → Trusted Publishing with owner `shogun-kub`, repository `Cyriller`
+  and workflow file `publish.yml`.
 
 ## Testing
 
