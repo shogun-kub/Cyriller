@@ -38,11 +38,11 @@ E:\Projects\Cyriller\Cyriller
 ├─ Cyriller/                    # THE LIBRARY (namespace Cyriller)
 │  ├─ *.cs                      # 22 source files (see §4)
 │  ├─ App_Data/                 # dictionaries: .json (source) → .txt (DictionaryBuilder) → .gz
-│  ├─ Cyriller.csproj           # net10.0 + netstandard2.1, Zipper PreBuild
+│  ├─ Cyriller.csproj           # net10.0 + netstandard2.1, no build-time packing
 │  └─ pack.bat                  # dotnet pack -c Release --force
 ├─ Cyriller.Model/              # public enums + dictionary JSON DTOs (9 .cs files)
 ├─ Cyriller.Rule/               # dictionary entry → rule string (3 .cs files)
-├─ Cyriller.Zipper/             # gzip packer used by the library build (1 .cs file)
+├─ Cyriller.Zipper/             # gzip packer, run by hand after .txt changes (1 .cs file)
 ├─ Cyriller.Samples/            # console demo of every API area
 ├─ Cyriller.DictionaryBuilder/  # JSON → App_Data/*.txt generator (replaces the T4 templates)
 ├─ Cyriller.Tests/              # xunit 2.9 tests (net10.0), no database
@@ -58,7 +58,7 @@ E:\Projects\Cyriller\Cyriller
 
 | Project | Path | Type | Target framework(s) | References | Restore |
 | --- | --- | --- | --- | --- | --- |
-| Cyriller | [`Cyriller/`](Cyriller) | class library | `net10.0;netstandard2.1` | Cyriller.Model, Cyriller.Rule; Cyriller.Zipper at build time | `PackageReference` |
+| Cyriller | [`Cyriller/`](Cyriller) | class library | `net10.0;netstandard2.1` | Cyriller.Model, Cyriller.Rule | `PackageReference` |
 | Cyriller.Model | [`Cyriller.Model/`](Cyriller.Model) | class library | `net10.0;netstandard2.1` | — | `PackageReference` |
 | Cyriller.Rule | [`Cyriller.Rule/`](Cyriller.Rule) | class library | `net10.0;netstandard2.1` | Cyriller.Model | `PackageReference` |
 | Cyriller.Zipper | [`Cyriller.Zipper/`](Cyriller.Zipper) | console (`Exe`) | `net10.0` | — | `PackageReference` |
@@ -75,7 +75,7 @@ E:\Projects\Cyriller\Cyriller
                     └──────┬───────┘
                  ┌─────────┴─────────┐
         ┌────────▼───────┐   ┌───────▼────────┐
-        │ Cyriller.Rule  │   │   Cyriller     │◄── Cyriller.Zipper (build-time)
+        │ Cyriller.Rule  │   │   Cyriller     │◄── Cyriller.Zipper (manual)
         └────────┬───────┘   └───┬────────┬───┘
                  └───────────────┘        │
                                           │
@@ -253,7 +253,7 @@ This project is used by `Cyriller.DictionaryBuilder`, so its output is baked int
 App_Data/nouns.json  (64.2 MB) ──Cyriller.DictionaryBuilder──► App_Data/nouns.txt  (3.6 MB)
 App_Data/adjectives.json (43.9 MB) ──Cyriller.DictionaryBuilder─► App_Data/adjectives.txt (1.2 MB)
         │                                                              │
-        │  Cyriller.Checker → JsonForm exports these JSON files        │  build-time
+        │  Cyriller.Checker → JsonForm exports these JSON files        │  by hand
         │  from the current collections                                ▼
         │                                              Cyriller.Zipper → nouns.gz (606 KB)
         │                                                              adjectives.gz (211 KB)
@@ -266,10 +266,12 @@ App_Data/adjectives.json (43.9 MB) ──Cyriller.DictionaryBuilder─► App_Da
 `Cyriller.DictionaryBuilder` reads the JSON, builds rule strings with `Cyriller.Rule`, deduplicates
 them (624 noun rule rows, 53 adjective rule rows) and writes the rules block delimited by
 `// -- Start of the Rules block -- //` / `// -- End of the Rules block -- //`, then one line per
-word. `Cyriller.csproj` runs `Cyriller.Zipper` before compiling:
+word. The `.gz` is packed by hand (the build does not run the packer — that raced the solution
+build on CI):
 
 ```
-dotnet run --no-build --no-restore --project ..\Cyriller.Zipper $(ProjectDir)App_Data\nouns.txt $(ProjectDir)App_Data\nouns.gz OnlyIfSourceIsNewer
+dotnet run --project Cyriller.Zipper -- Cyriller/App_Data/nouns.txt Cyriller/App_Data/nouns.gz Always
+dotnet run --project Cyriller.Zipper -- Cyriller/App_Data/adjectives.txt Cyriller/App_Data/adjectives.gz Always
 ```
 
 `Cyriller.Zipper` takes `[source] [destination] [OnlyIfSourceIsNewer|Always]`, gzips the source and
@@ -319,12 +321,12 @@ as six-element arrays).
 2. Regenerate the `.txt`:
    `dotnet run --project Cyriller.DictionaryBuilder -- nouns Cyriller\App_Data\nouns.json Cyriller\App_Data\nouns.txt`
    (and the same with `adjectives`).
-3. Build `Cyriller` so `Cyriller.Zipper` repacks the `.gz`; revert the `.gz` afterwards unless the
-   data change is what you intend to commit.
+3. Repack the `.txt` into `.gz` with the commands above and commit both files;
+   `EmbeddedDictionaryTests` fails when they diverge.
 
 ## 8. `Cyriller.Tests`
 
-`net10.0` project, xunit 2.9.3 + Microsoft.NET.Test.Sdk 17.14.2, 70 tests, no database:
+`net10.0` project, xunit 2.9.3 + Microsoft.NET.Test.Sdk 17.14.2, 72 tests, no database:
 
 | File | Coverage |
 | --- | --- |
@@ -336,7 +338,8 @@ as six-element arrays).
 | [`UdNounTests.cs`](Cyriller.Tests/UdNounTests.cs) | Up to 4000 noun tokens of `ru_syntagrus-ud-test.conllu`: the corpus form must be the one the dictionary gives for the lemma, its case and its number |
 | [`KaikkiNounTests.cs`](Cyriller.Tests/KaikkiNounTests.cs) | Up to 1200 dictionary nouns from the first 400 000 lines of `ru-extract.jsonl`: every Wiktionary form of an attested case/number must match, with stress marks and non-Russian letters filtered out |
 | [`NameDeclensionTests.cs`](Cyriller.Tests/NameDeclensionTests.cs) | 5000 sampled surname + given-name pairs (2500 male, 2500 female, distinct combinations, seed `20261113`) declined by `CyrName` and compared with the `Sur`/`Giv` `PROPN` forms attested in SynTagRus; the name type is part of the key, because the same string can be both a surname and a given name |
-| [`CorpusFiles.cs`](Cyriller.Tests/CorpusFiles.cs) | Finds `Test_data` from the build output, shares a single `CyrNounCollection` and normalises `ё` and stress marks |
+| [`EmbeddedDictionaryTests.cs`](Cyriller.Tests/EmbeddedDictionaryTests.cs) | Decompresses `App_Data/*.gz` and compares it byte for byte with `App_Data/*.txt`; a forgotten repack fails the suite |
+| [CorpusFiles.cs](Cyriller.Tests/CorpusFiles.cs) | Finds `Test_data` from the build output, shares a single `CyrNounCollection` and normalises `ё` and stress marks |
 
 The EF6 model and the SQL Server fixture were removed together with the old `NounTests`; the
 dictionary checks now run against the embedded resources and the external corpora, so

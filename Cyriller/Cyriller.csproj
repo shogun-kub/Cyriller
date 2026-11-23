@@ -36,9 +36,6 @@
     <ProjectReference Include="..\Cyriller.Rule\Cyriller.Rule.csproj" PrivateAssets="All"></ProjectReference>
   </ItemGroup>
 
-  <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
-    <Exec Command="dotnet run -c $(Configuration) --no-restore --project $(ProjectDir)..\Cyriller.Zipper\Cyriller.Zipper.csproj $(ProjectDir)App_Data\nouns.txt $(ProjectDir)App_Data\nouns.gz OnlyIfSourceIsNewer&#xD;&#xA;dotnet run -c $(Configuration) --no-restore --project $(ProjectDir)..\Cyriller.Zipper\Cyriller.Zipper.csproj $(ProjectDir)App_Data\adjectives.txt $(ProjectDir)App_Data\adjectives.gz OnlyIfSourceIsNewer" />
-  </Target>
 
   <Target Name="CopyProjectReferencesToPackage" DependsOnTargets="ResolveReferences">
     <ItemGroup>
