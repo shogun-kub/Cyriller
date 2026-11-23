@@ -7,9 +7,8 @@ on:
 
 jobs:
   publish:
-    # Windows нужен из-за путей в PreBuild-таргете: Zipper запускается как
-    # "dotnet run --project $(ProjectDir)..\Cyriller.Zipper\...", а на Linux обратные слэши
-    # не являются разделителями.
+    # Windows обязателен: Cyriller.Checker — WinForms (net10.0-windows), на Linux он не
+    # собирается; Desktop на Avalonia тоже удобнее проверять на той же платформе.
     runs-on: windows-latest
     permissions:
       id-token: write
